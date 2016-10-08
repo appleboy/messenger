@@ -279,6 +279,16 @@ func (m *Messenger) SendWithReplies(to Recipient, message string, replies []Quic
 	return response.TextWithReplies(message, replies)
 }
 
+// Attachment send image, audio, video and file attachment.
+func (m *Messenger) Attachment(to Recipient, dataType, url string) error {
+	response := &Response{
+		token: m.token,
+		to:    to,
+	}
+
+	return response.Attachment(dataType, url)
+}
+
 // classify determines what type of message a webhook event is.
 func (m *Messenger) classify(info MessageInfo, e Entry) Action {
 	if info.Message != nil {

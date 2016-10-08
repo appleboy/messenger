@@ -103,6 +103,41 @@ func (r *Response) Image(im image.Image) error {
 	return nil
 }
 
+// Attachment send image, audio, video and file attachment
+func (r *Response) Attachment(dataType, url string) error {
+	m := SendStructuredMessage{
+		Recipient: r.to,
+		Message: StructuredMessageData{
+			Attachment: StructuredMessageAttachment{
+				Type: dataType,
+				Payload: StructuredMessagePayload{
+					Url: url,
+				},
+			},
+		},
+	}
+
+	data, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", SendMessageURL, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.URL.RawQuery = "access_token=" + r.token
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+
+	return err
+}
+
 // ButtonTemplate sends a message with the main contents being button elements
 func (r *Response) ButtonTemplate(text string, buttons *[]StructuredMessageButton) error {
 	m := SendStructuredMessage{
